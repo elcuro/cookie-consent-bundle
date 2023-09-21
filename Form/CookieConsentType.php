@@ -69,22 +69,31 @@ class CookieConsentType extends AbstractType
             ]);
         }
 
-        if ($this->cookieConsentSimplified === false) {
-            $builder->add('save', SubmitType::class, ['label' => 'ch_cookie_consent.save', 'attr' => ['class' => 'btn ch-cookie-consent__btn']]);
-        } else {
-            $builder->add('use_only_functional_cookies', SubmitType::class, ['label' => 'ch_cookie_consent.use_only_functional_cookies', 'attr' => ['class' => 'btn ch-cookie-consent__btn']]);
-            $builder->add('use_all_cookies', SubmitType::class, ['label' => 'ch_cookie_consent.use_all_cookies', 'attr' => ['class' => 'btn ch-cookie-consent__btn ch-cookie-consent__btn--secondary']]);
+        $builder->add('save', SubmitType::class, [
+            'label' => 'ch_cookie_consent.save',
+            'attr' => ['class' => 'btn ch-cookie-consent__btn', 'value' => 'save'],
+        ]);
+        $builder->add('use_only_functional_cookies', SubmitType::class, [
+            'label' => 'ch_cookie_consent.use_only_functional_cookies',
+            'attr' => ['class' => 'btn ch-cookie-consent__btn', 'value' => 'use_only_functional_cookies']
+        ]);
+        $builder->add('use_all_cookies', SubmitType::class, [
+            'label' => 'ch_cookie_consent.use_all_cookies',
+            'attr' => ['class' => 'btn ch-cookie-consent__btn ch-cookie-consent__btn--secondary', 'value' => 'use_all_cookies']
+        ]);
 
-            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-                $data = $event->getData();
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
 
+            if(!$form->get('save')->isClicked()) {
                 foreach ($this->cookieCategories as $category) {
-                    $data[$category] = isset($data['use_all_cookies']) ? 'true' : 'false';
+                    $data[$category] = $form->get('use_all_cookies')->isClicked() ? 'true' : 'false';
                 }
+            }
 
-                $event->setData($data);
-            });
-        }
+            $event->setData($data);
+        });
     }
 
     /**
