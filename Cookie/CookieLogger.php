@@ -11,6 +11,7 @@ namespace ConnectHolland\CookieConsentBundle\Cookie;
 
 use ConnectHolland\CookieConsentBundle\Entity\CookieConsentLog;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,10 +27,10 @@ class CookieLogger
      */
     private $request;
 
-    public function __construct(ManagerRegistry $registry, ?Request $request)
+    public function __construct(EntityManagerInterface $registry, ?Request $request)
     {
-        $this->entityManager = $registry->getManagerForClass(CookieConsentLog::class);
-        $this->request       = $request;
+        $this->entityManager = $registry;
+        $this->request = $request;
     }
 
     /**
