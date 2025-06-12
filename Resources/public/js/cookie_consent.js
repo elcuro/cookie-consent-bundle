@@ -70,12 +70,20 @@ function serializeForm(form, clickedButton) {
     for (var i = 0; i < form.elements.length; i++) {
         var field = form.elements[i];
 
-        if ((field.type !== 'checkbox' && field.type !== 'radio' && field.type !== 'button') || field.checked) {
-            serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
-        }
+        if (!field.name) continue;
+
+        if ((field.type === 'checkbox' || field.type === 'radio') && !field.checked) continue;
+
+        if (field.type === 'submit' || field.type === 'button' || field.type === 'reset') continue;
+
+        serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
     }
 
-    serialized.push(encodeURIComponent(clickedButton.getAttribute('name')) + "=");
+    if (clickedButton && clickedButton.name) {
+        serialized.push(
+            encodeURIComponent(clickedButton.name) + "=" + encodeURIComponent(clickedButton.value || '')
+        );
+    }
 
     return serialized.join('&');
 }
